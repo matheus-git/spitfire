@@ -124,3 +124,9 @@ cargo build --release
 ```
 
 If everything is set up correctly, a MessageBox should appear. And the final binary will weigh around 2KB!
+
+***
+
+#### Article source:
+
+::github{repo="matheus-git/spitfire"}
