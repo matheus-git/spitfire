@@ -1,5 +1,5 @@
 ---
-title: "Minimal PE: A no_std Rust Setup for Windows"
+title: "How to Build Minimal Windows PE Files in Rust"
 published: 2026-03-22
 description: "A practical guide to building minimal Windows binaries in Rust using no_std and no_main, with custom entry points and WinAPI bindings."
 image: ""
@@ -47,7 +47,7 @@ strip = true
 target = "x86_64-pc-windows-msvc"
 
 rustflags = [
-  "-C", "link-arg=/ENTRY:mainCRTStartup",
+  "-C", "link-arg=/ENTRY:main",
   "-C", "link-arg=/SUBSYSTEM:WINDOWS",
   "-C", "link-arg=/NODEFAULTLIB",
   "-C", "link-arg=/MERGE:.rdata=.text",
@@ -56,7 +56,7 @@ rustflags = [
 ```
 
 - `target = "x86_64-pc-windows-msvc"` sets the default compilation target, so you don't need to pass **--target** on every cargo build.
-- `/ENTRY:mainCRTStartup` tells the linker which function serves as the binary's entry point.
+- `/ENTRY:main` tells the linker which function serves as the binary's entry point.
 - `/SUBSYSTEM:WINDOWS` defines the PE subsystem. Using **WINDOWS** instead of **CONSOLE** tells Windows this is a GUI application.
 - `/NODEFAULTLIB` instructs the linker to not automatically link any default libraries, only what you explicitly declare gets linked.
 - `/MERGE:.rdata=.text` merges the **.rdata** section into **.text**, reducing the total number of PE sections and trimming binary size.
@@ -95,7 +95,7 @@ fn panic(_: &PanicInfo) -> ! {
 }
 
 #[unsafe(no_mangle)]
-pub extern "system" fn mainCRTStartup() -> ! {
+pub extern "system" fn main() -> ! {
     static TITLE: &[u8] = b"Title\0";
     static BODY: &[u8] = b"Hello, world!\0";
 
@@ -115,7 +115,7 @@ pub extern "system" fn mainCRTStartup() -> ! {
 - `#![no_main]` tells the compiler you are not using the standard main entry point, allowing you to define your own.
 - `#[link(name = "...")]` instructs the linker to include a specific Windows library.
 - `#[panic_handler]` is mandatory in **no_std**, without the standard library, you must define what happens on a panic yourself.
-- `#[unsafe(no_mangle)]` prevents Rust from mangling the function name, ensuring the linker can find mainCRTStartup as the entry point we declared in config.toml.
+- `#[unsafe(no_mangle)]` prevents Rust from mangling the function name, ensuring the linker can find main as the entry point we declared in config.toml.
 
 #### Build and Run
 ```ps
